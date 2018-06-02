@@ -1,12 +1,10 @@
 <?php
-	//Key = f358b2ee7c38c1b3c9c7414b4a681a8c
-	//Secret = f02920323395b945
 	$tag = 'surf,bali';
   $por_pagina = '6';
-	$url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=36d9a50635386bedf4f5c45e3cf6f5bf&tags='.$tag.'&per_page='.$por_pagina.'&format=json&nojsoncallback=1';
-	$data = json_decode(file_get_contents( $url ));
-
-  $photos = $data->photos->photo;
+	$url = 'https://api.flickr.com/services/feeds/photos_public.gne?format=php_serial&tags='.$tag;
+	$data = unserialize(file_get_contents( $url ));
+  $data_items = $data['items'];
+  $photos = array_slice($data_items, 0, 6);
 ?>
 
 <!DOCTYPE html>
@@ -27,26 +25,33 @@
       max-width: 100%;
       height: auto;
     }
+    .title-row h1{
+      margin-bottom: 30px;
+    }
+    .photo-wrap{
+      margin-bottom: 30px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="row">
+      <div class="row title-row">
         <h1 class="text-center">Fotos de Surf</h1>
       </div>
     </header>
   	<div class="row">
   		<?php foreach ($photos as $photo):
-        $image_url = 'http://farm'.$photo->farm.'.staticflickr.com/'.$photo->server.'/'.$photo->id.'_'.$photo->secret.'.jpg';?>
+        $image_url = $photo['l_url'];?>
         <div class="photo-wrap col-md-6 text-center">
-          <h3 class="photo-title"> <?php echo $photo->title; ?></h3>
           <div class="img-wrap">
             <img src="<?php echo $image_url?>" alt="">
           </div>
+          <h4 class="photo-title"> <?php echo $photo['title']; ?></h4>
         </div>
       <?php endforeach; ?>
   	</div>
   </div>
+  <script src="scripts.js"></script>
 </body>
 </html>
